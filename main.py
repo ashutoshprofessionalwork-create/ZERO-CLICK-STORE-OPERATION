@@ -70,6 +70,23 @@ def list_products():
     return tools.get_all_products()
 
 
+@app.get("/api/products/search")
+def search_products(q: str = ""):
+    """Search products by name keyword. Used by phonecall voice channel."""
+    if not q.strip():
+        return {"products": tools.get_all_products()}
+    return {"products": tools.search_product(q)}
+
+
+@app.get("/api/products/{product_id}")
+def get_product(product_id: int):
+    """Get a single product by ID. Used by phonecall voice channel."""
+    result = tools.check_inventory(product_id)
+    if "error" in result:
+        return JSONResponse(result, status_code=404)
+    return result
+
+
 @app.post("/api/products")
 async def create_product(request: Request):
     data = await request.json()
@@ -115,11 +132,12 @@ async def place_order(request: Request):
     items = data.get("items", [])
     name = data.get("customer_name")
     address = data.get("address")
+    source = data.get("source", "web")
 
     if not items:
         return JSONResponse({"error": "Items list cannot be empty"}, status_code=400)
 
-    res = tools.create_order(phone, items, name, address)
+    res = tools.create_order(phone, items, name, address, source=source)
     if "error" in res:
         return JSONResponse(res, status_code=400)
     return res
