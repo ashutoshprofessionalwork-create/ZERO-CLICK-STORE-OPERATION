@@ -93,11 +93,13 @@ async def handle_incoming_call(
     # Construct TwiML response
     twiml = VoiceResponse()
 
+    action_path = request.scope.get("root_path", "") + "/process-speech"
+
     # Twilio <Gather> collects spoken audio from customer
     # language="hi-IN" provides optimal Hindi & Hinglish transcription
     gather = twiml.gather(
         input="speech",
-        action="/process-speech",
+        action=action_path,
         method="POST",
         language=config.TWILIO_VOICE_LANGUAGE,
         speech_timeout="auto",
@@ -121,7 +123,7 @@ async def handle_incoming_call(
     # Second gather attempt
     gather_retry = twiml.gather(
         input="speech",
-        action="/process-speech",
+        action=action_path,
         method="POST",
         language=config.TWILIO_VOICE_LANGUAGE,
         speech_timeout="auto",
@@ -175,11 +177,12 @@ async def process_speech(
     twiml = VoiceResponse()
 
     # Case 1: Customer remained silent or speech could not be transcribed
+    action_path = request.scope.get("root_path", "") + "/process-speech"
     if not SpeechResult or not SpeechResult.strip():
         logger.warning("No speech transcribed for CallSid %s", CallSid)
         gather = twiml.gather(
             input="speech",
-            action="/process-speech",
+            action=action_path,
             method="POST",
             language=config.TWILIO_VOICE_LANGUAGE,
             speech_timeout="auto",
@@ -242,7 +245,7 @@ async def process_speech(
         # Continue the conversation with another <Gather>
         gather = twiml.gather(
             input="speech",
-            action="/process-speech",
+            action=action_path,
             method="POST",
             language=config.TWILIO_VOICE_LANGUAGE,
             speech_timeout="auto",
