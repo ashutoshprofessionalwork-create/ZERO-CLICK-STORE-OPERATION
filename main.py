@@ -1,20 +1,73 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+import os
 from typing import List, Optional
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import uvicorn
+
 from ai.agent import run_agent_loop
 from backend import tools
 from phonecall.main import app as phonecall_app
 
-app = FastAPI(title="Zero-Click Store Operator API")
+app = FastAPI(
+    title="Zero-Click Store Operator API & Portal",
+    description="Autonomous Kirana Store Operator with Customer Front & Admin Portal",
+    version="1.0.0"
+)
 
-# Mount phonecall app sub-router/app or route handlers
+# Enable CORS for local & remote browser interactions
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount phonecall app sub-router
 app.mount("/phone", phonecall_app)
 
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
+
+# Mount frontend directory for static assets (CSS, JS, icons)
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+
+# =====================================================================
+# PAGE ROUTES
+# =====================================================================
 @app.get("/")
+def home():
+    index_file = os.path.join(FRONTEND_DIR, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"status": "ok", "service": "Zero-Click Store Operator Agent API"}
+
+
+@app.get("/store")
+def store_page():
+    index_file = os.path.join(FRONTEND_DIR, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return JSONResponse({"error": "Store frontend not found"}, status_code=404)
+
+
+@app.get("/admin")
+def admin_page():
+    admin_file = os.path.join(FRONTEND_DIR, "admin.html")
+    if os.path.exists(admin_file):
+        return FileResponse(admin_file)
+    return JSONResponse({"error": "Admin portal not found"}, status_code=404)
+
+
+@app.get("/health")
+@app.get("/api/health")
 def health_check():
     return {"status": "ok", "service": "Zero-Click Store Operator Agent API"}
+
 
 @app.post("/agent/chat")
 async def chat_endpoint(request: Request):
@@ -32,6 +85,7 @@ async def chat_endpoint(request: Request):
     reply = run_agent_loop(customer_phone=phone, user_message=message)
     return {"phone": phone, "message": message, "reply": reply}
 
+
 # =====================================================================
 # REST ENDPOINTS FOR SHARED BACKEND (Used by Phonecall & External Clients)
 # =====================================================================
@@ -45,6 +99,7 @@ def search_products(q: str = ""):
     products = tools.search_product(q)
     return {"products": products}
 
+
 @app.get("/api/products/{product_id}")
 def get_product_inventory(product_id: int):
     """
@@ -55,9 +110,11 @@ def get_product_inventory(product_id: int):
         return JSONResponse(res, status_code=404)
     return res
 
+
 class OrderItemSchema(BaseModel):
     product_id: int
     quantity: int
+
 
 class CreateOrderSchema(BaseModel):
     customer_phone: str
@@ -65,6 +122,7 @@ class CreateOrderSchema(BaseModel):
     customer_name: Optional[str] = None
     address: Optional[str] = None
     source: Optional[str] = "api"
+
 
 @app.post("/api/orders")
 def create_order_endpoint(payload: CreateOrderSchema):
@@ -82,6 +140,6 @@ def create_order_endpoint(payload: CreateOrderSchema):
         return JSONResponse(res, status_code=400)
     return res
 
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-

@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Grocery AI Agent</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<h1>🛒 Grocery AI Agent</h1>
+<p>Temporary cart → checkout → explicit confirmation → inventory update</p>
+
+<h2>Products</h2>
+<div id="products"></div>
+
+<h2>Chat</h2>
+<div id="chat"></div>
+<div class="row">
+<input id="msg" placeholder="Try: 2 kg rice">
+<button onclick="send()">Send</button>
+</div>
+
+<h2>Confirmed Orders</h2>
+<button onclick="orders()">Refresh</button>
+<div id="orders"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

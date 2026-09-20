@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kirana Store Admin Portal | Zero-Click Operator</title>
+  <meta name="description" content="Merchant command center and real-time inventory manager for the Zero-Click Store Operator.">
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+
+  <!-- Admin Top Navigation -->
+  <header class="admin-navbar">
+    <div class="admin-nav-container">
+      <a href="/admin" class="admin-brand" id="admin-brand">
+        <div class="admin-brand-icon">🏪</div>
+        <div class="admin-brand-text">
+          <h1>Kirana Command Center</h1>
+          <span>Zero-Click Autonomous Operator</span>
+        </div>
+      </a>
+
+      <div class="admin-nav-right">
+        <div class="badge-auto-mode" id="badge-auto-mode">
+          <span class="pulse-dot"></span>
+          <span>Autonomous Loop Active</span>
+        </div>
+        <a href="/store" class="btn-link-store" id="btn-view-store">
+          <span>🛍️</span>
+          <span>View Customer Store</span>
+        </a>
+        <button class="btn-refresh-data" id="btn-refresh-data">
+          <span>🔄</span>
+          <span>Sync DB</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dashboard Container -->
+  <main class="admin-container">
+    
+    <!-- KPI Statistic Overview Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card revenue" id="kpi-revenue-card">
+        <div class="kpi-icon-box">₹</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Total Store Revenue</div>
+          <div class="kpi-value" id="kpi-revenue">₹0.00</div>
+        </div>
+      </div>
+
+      <div class="kpi-card orders" id="kpi-orders-card">
+        <div class="kpi-icon-box">📦</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Orders Processed</div>
+          <div class="kpi-value" id="kpi-orders">0</div>
+        </div>
+      </div>
+
+      <div class="kpi-card alerts" id="kpi-alerts-card">
+        <div class="kpi-icon-box">⚠️</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Low Stock Alerts</div>
+          <div class="kpi-value" id="kpi-low-stock">0</div>
+        </div>
+      </div>
+
+      <div class="kpi-card products" id="kpi-products-card">
+        <div class="kpi-icon-box">🏷️</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Active Products</div>
+          <div class="kpi-value" id="kpi-products">0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Inventory Management Section -->
+    <section class="admin-section" id="inventory-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span style="font-size: 1.35rem;">📦</span>
+          <h2 class="section-title">Live Inventory & Stock Management</h2>
+        </div>
+
+        <div class="section-actions">
+          <input 
+            type="text" 
+            id="search-inventory" 
+            class="input-table-search" 
+            placeholder="Search products in stock..."
+          />
+          <button class="btn-primary-action" id="btn-open-add-product">
+            <span>+</span>
+            <span>Add New Item</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table" id="inventory-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">ID</th>
+              <th>Product Name</th>
+              <th>Unit Price</th>
+              <th>Current Stock</th>
+              <th>Alert Level</th>
+              <th>Status</th>
+              <th style="text-align: right;">Quick Adjust</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-tbody">
+            <!-- Dynamically populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Live Customer Orders Section -->
+    <section class="admin-section" id="orders-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span style="font-size: 1.35rem;">📋</span>
+          <h2 class="section-title">Live Orders & Automated Dispatches</h2>
+        </div>
+
+        <div class="section-actions">
+          <span class="badge-status confirmed" id="orders-count-badge">Live Feed</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table" id="orders-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">Order #</th>
+              <th>Customer</th>
+              <th>Delivery Address</th>
+              <th>Items Ordered</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <!-- Dynamically populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Autonomous AI Activity Audit Log -->
+    <section class="admin-section" id="audit-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span style="font-size: 1.35rem;">🤖</span>
+          <h2 class="section-title">Autonomous Agent Audit Trail (Tool Calling Logs)</h2>
+        </div>
+        <span class="badge-status in-stock">Auditable & Real-time</span>
+      </div>
+
+      <div class="audit-log-container" id="audit-log-container">
+        <!-- Dynamically populated via JavaScript -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Add New Product Modal -->
+  <div class="modal-admin-overlay" id="add-product-modal">
+    <div class="modal-admin-card">
+      <div class="modal-admin-header">
+        <h3 style="font-family: var(--font-heading); font-size: 1.15rem;">Add New Product to Store</h3>
+        <button class="btn-cancel" id="btn-close-modal" style="padding: 0.2rem 0.5rem;">✕</button>
+      </div>
+
+      <form id="add-product-form">
+        <div class="modal-admin-body">
+          <div class="form-group">
+            <label class="form-label" for="new-prod-name">Product Name & Pack Size</label>
+            <input type="text" id="new-prod-name" class="form-input" placeholder="e.g., Fortune Kachi Ghani Mustard Oil 1L" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-prod-price">Retail Price (₹)</label>
+            <input type="number" id="new-prod-price" class="form-input" step="0.5" placeholder="165.0" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-prod-stock">Initial Stock Quantity</label>
+            <input type="number" id="new-prod-stock" class="form-input" placeholder="20" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-prod-threshold">Low Stock Warning Threshold</label>
+            <input type="number" id="new-prod-threshold" class="form-input" value="5" required>
+          </div>
+        </div>
+
+        <div class="modal-admin-footer">
+          <button type="button" class="btn-cancel" id="btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-primary-action" id="btn-save-product">Add to Inventory</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Portal Logic Script -->
+  <script>
+    // Fallback seed catalog for offline / standalone browsing
+    let inventoryData = [
+      { id: 1, name: "Aashirvaad Atta 5kg", price: 260.0, stock: 15, low_stock_threshold: 5 },
+      { id: 2, name: "Fortune Sunlite Sunflower Oil 1L", price: 145.0, stock: 10, low_stock_threshold: 3 },
+      { id: 3, name: "Maggi 2-Minute Noodles 70g", price: 14.0, stock: 50, low_stock_threshold: 10 },
+      { id: 4, name: "Amul Butter 100g", price: 56.0, stock: 8, low_stock_threshold: 3 },
+      { id: 5, name: "Amul Taaza Milk 500ml", price: 27.0, stock: 20, low_stock_threshold: 5 },
+      { id: 6, name: "Tata Salt 1kg", price: 28.0, stock: 30, low_stock_threshold: 5 },
+      { id: 7, name: "Surf Excel Easy Wash Powder 1kg", price: 140.0, stock: 12, low_stock_threshold: 3 },
+      { id: 8, name: "Taj Mahal Tea 250g", price: 180.0, stock: 6, low_stock_threshold: 2 },
+      { id: 9, name: "Good Day Cashew Biscuits 100g", price: 30.0, stock: 25, low_stock_threshold: 5 },
+      { id: 10, name: "Dettol Original Soap 125g", price: 45.0, stock: 15, low_stock_threshold: 4 },
+      { id: 11, name: "Aashirvaad Atta 10kg", price: 490.0, stock: 1, low_stock_threshold: 2 },
+      { id: 12, name: "Fortune Mustard Oil 1L", price: 160.0, stock: 0, low_stock_threshold: 3 }
+    ];
+
+    let ordersData = [
+      {
+        id: 1,
+        customer_phone: "+919999000011",
+        customer_name: "Ramesh Sharma",
+        customer_address: "Flat 402, Sunshine Heights",
+        total: 520.0,
+        status: "confirmed",
+        created_at: "Today, 12:45 PM",
+        items: [
+          { product_id: 1, product_name: "Aashirvaad Atta 5kg", quantity: 2, unit_price: 260.0 }
+        ]
+      }
+    ];
+
+    let auditLogs = [
+      { tag: "create_order", text: "Autonomous Agent created Order #1 for customer +919999000011", time: "12:45 PM" },
+      { tag: "update_inventory", text: "Deducted 2 units of Aashirvaad Atta 5kg (new stock: 13)", time: "12:45 PM" },
+      { tag: "check_inventory", text: "Customer inquired for Fortune Mustard Oil -> Detected 0 stock, suggested Sunflower Oil alternate", time: "12:30 PM" },
+      { tag: "search_product", text: "Search query 'atta' returned 2 matching SKUs", time: "12:28 PM" }
+    ];
+
+    let filterSearch = "";
+
+    // Fetch live dashboard data
+    async function loadDashboard() {
+      await Promise.all([loadStats(), loadInventory(), loadOrders()]);
+      renderAuditLogs();
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch("/api/stats");
+        if (res.ok) {
+          const stats = await res.json();
+          document.getElementById("kpi-revenue").textContent = `₹${stats.total_revenue.toFixed(2)}`;
+          document.getElementById("kpi-orders").textContent = stats.total_orders;
+          document.getElementById("kpi-low-stock").textContent = stats.low_stock_count;
+          document.getElementById("kpi-products").textContent = stats.total_products;
+
+          const alertCard = document.getElementById("kpi-alerts-card");
+          if (stats.low_stock_count > 0) {
+            alertCard.classList.add("has-alert");
+          } else {
+            alertCard.classList.remove("has-alert");
+          }
+          return;
+        }
+      } catch (err) {
+        console.log("Stats API offline, calculating from local state:", err);
+      }
+
+      // Fallback calculation
+      const rev = ordersData.reduce((acc, o) => acc + (o.total || 0), 0);
+      const lowCount = inventoryData.filter(p => p.stock <= p.low_stock_threshold).length;
+      document.getElementById("kpi-revenue").textContent = `₹${rev.toFixed(2)}`;
+      document.getElementById("kpi-orders").textContent = ordersData.length;
+      document.getElementById("kpi-low-stock").textContent = lowCount;
+      document.getElementById("kpi-products").textContent = inventoryData.length;
+    }
+
+    async function loadInventory() {
+      try {
+        const res = await fetch("/api/products");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            inventoryData = data;
+          }
+        }
+      } catch (err) {
+        console.log("Using cached inventory data");
+      }
+      renderInventoryTable();
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch("/api/orders");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            ordersData = data;
+          }
+        }
+      } catch (err) {
+        console.log("Using cached orders data");
+      }
+      renderOrdersTable();
+    }
+
+    function renderInventoryTable() {
+      const tbody = document.getElementById("inventory-tbody");
+      tbody.innerHTML = "";
+
+      const filtered = inventoryData.filter(p => 
+        p.name.toLowerCase().includes(filterSearch.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching products found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const tr = document.createElement("tr");
+
+        let statusClass = "in-stock";
+        let statusText = "Normal";
+
+        if (p.stock === 0) {
+          statusClass = "depleted";
+          statusText = "Depleted";
+        } else if (p.stock <= p.low_stock_threshold) {
+          statusClass = "low-stock";
+          statusText = "Low Stock";
+        }
+
+        tr.innerHTML = `
+          <td style="color: var(--text-muted); font-family: monospace;">#${p.id}</td>
+          <td>
+            <div class="product-name-cell">
+              <span>${p.name}</span>
+            </div>
+          </td>
+          <td><span class="price-tag">₹${p.price.toFixed(2)}</span></td>
+          <td><b style="font-size: 1rem; color: ${p.stock <= p.low_stock_threshold ? 'var(--amber)' : 'var(--text-main)'}">${p.stock}</b> units</td>
+          <td style="color: var(--text-muted);">&le; ${p.low_stock_threshold} units</td>
+          <td><span class="badge-status ${statusClass}">${statusText}</span></td>
+          <td>
+            <div class="stock-actions" style="justify-content: flex-end;">
+              <button class="btn-stock-adjust minus" data-id="${p.id}" data-delta="-1" title="Deduct 1" ${p.stock <= 0 ? 'disabled' : ''}>-1</button>
+              <button class="btn-stock-adjust plus" data-id="${p.id}" data-delta="1" title="Add 1">+1</button>
+              <button class="btn-stock-adjust plus" data-id="${p.id}" data-delta="5" title="Add 5">+5</button>
+            </div>
+          </td>
+        `;
+
+        tr.querySelectorAll(".btn-stock-adjust").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const pId = parseInt(btn.dataset.id);
+            const delta = parseInt(btn.dataset.delta);
+            await updateStock(pId, delta);
+          });
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function updateStock(productId, delta) {
+      try {
+        const res = await fetch("/api/inventory/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: productId, qty_delta: delta })
+        });
+
+        if (res.ok) {
+          const updated = await res.json();
+          addAuditLog("update_inventory", `Adjusted stock for product #${productId} by ${delta > 0 ? '+' + delta : delta} (New stock: ${updated.new_stock})`);
+          await loadDashboard();
+          return;
+        }
+      } catch (err) {
+        console.log("Local stock simulation:", err);
+      }
+
+      // Offline simulation
+      const item = inventoryData.find(p => p.id === productId);
+      if (item) {
+        item.stock = Math.max(0, item.stock + delta);
+        addAuditLog("update_inventory", `Stock for ${item.name} adjusted by ${delta > 0 ? '+' + delta : delta} (New stock: ${item.stock})`);
+        renderInventoryTable();
+        loadStats();
+      }
+    }
+
+    function renderOrdersTable() {
+      const tbody = document.getElementById("orders-tbody");
+      tbody.innerHTML = "";
+
+      if (ordersData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No orders placed yet. Place an order from the customer storefront!</td></tr>`;
+        return;
+      }
+
+      ordersData.forEach(o => {
+        const tr = document.createElement("tr");
+
+        let itemsHtml = "";
+        if (Array.isArray(o.items) && o.items.length > 0) {
+          itemsHtml = `<div class="order-items-pills">` + o.items.map(it => 
+            `<span class="item-pill"><b>${it.quantity}x</b> ${it.product_name || 'Item #' + it.product_id}</span>`
+          ).join("") + `</div>`;
+        } else {
+          itemsHtml = `<span style="color: var(--text-muted); font-size: 0.8rem;">No items recorded</span>`;
+        }
+
+        tr.innerHTML = `
+          <td><b style="font-family: monospace; color: var(--indigo);">#${o.id}</b></td>
+          <td>
+            <div style="font-weight: 600;">${o.customer_name || 'Customer'}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${o.customer_phone || 'N/A'}</div>
+          </td>
+          <td style="max-width: 180px; font-size: 0.82rem; color: var(--text-dim);">${o.customer_address || 'Kirana Pickup'}</td>
+          <td>${itemsHtml}</td>
+          <td><span class="price-tag">₹${(o.total || 0).toFixed(2)}</span></td>
+          <td>
+            <select class="status-select" data-id="${o.id}">
+              <option value="confirmed" ${o.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+              <option value="packed" ${o.status === 'packed' ? 'selected' : ''}>Packed</option>
+              <option value="out_for_delivery" ${o.status === 'out_for_delivery' ? 'selected' : ''}>Out for Delivery</option>
+              <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+            </select>
+          </td>
+          <td style="font-size: 0.78rem; color: var(--text-muted);">${o.created_at || 'Recently'}</td>
+        `;
+
+        tr.querySelector(".status-select").addEventListener("change", async (e) => {
+          const newStatus = e.target.value;
+          try {
+            await fetch(`/api/orders/${o.id}/status`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ status: newStatus })
+            });
+            addAuditLog("order_status", `Order #${o.id} marked as "${newStatus}"`);
+          } catch (err) {
+            addAuditLog("order_status", `Order #${o.id} status updated to "${newStatus}" (Offline)`);
+          }
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAuditLogs() {
+      const container = document.getElementById("audit-log-container");
+      container.innerHTML = "";
+
+      auditLogs.forEach(log => {
+        const div = document.createElement("div");
+        div.className = "audit-entry";
+        div.innerHTML = `
+          <div class="audit-desc">
+            <span class="audit-tag">${log.tag}</span>
+            <span>${log.text}</span>
+          </div>
+          <span class="audit-time">${log.time}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addAuditLog(tag, text) {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      auditLogs.unshift({ tag, text, time: timeStr });
+      if (auditLogs.length > 20) auditLogs.pop();
+      renderAuditLogs();
+    }
+
+    // Search inventory table
+    document.getElementById("search-inventory").addEventListener("input", (e) => {
+      filterSearch = e.target.value;
+      renderInventoryTable();
+    });
+
+    // Refresh button
+    document.getElementById("btn-refresh-data").addEventListener("click", () => {
+      loadDashboard();
+      addAuditLog("sync", "Merchant manually triggered database sync");
+    });
+
+    // Add Product Modal
+    const modal = document.getElementById("add-product-modal");
+    document.getElementById("btn-open-add-product").addEventListener("click", () => {
+      modal.classList.add("active");
+    });
+    document.getElementById("btn-close-modal").addEventListener("click", () => {
+      modal.classList.remove("active");
+    });
+    document.getElementById("btn-cancel-modal").addEventListener("click", () => {
+      modal.classList.remove("active");
+    });
+    modal.addEventListener("click", (e) => {
+      if (e.target.id === "add-product-modal") {
+        modal.classList.remove("active");
+      }
+    });
+
+    document.getElementById("add-product-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("new-prod-name").value.trim();
+      const price = parseFloat(document.getElementById("new-prod-price").value);
+      const stock = parseInt(document.getElementById("new-prod-stock").value);
+      const threshold = parseInt(document.getElementById("new-prod-threshold").value) || 5;
+
+      if (!name || isNaN(price) || isNaN(stock)) return;
+
+      try {
+        const res = await fetch("/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name, price, stock, low_stock_threshold: threshold
+          })
+        });
+
+        if (res.ok) {
+          const newP = await res.json();
+          addAuditLog("add_product", `Added new product "${name}" (ID #${newP.id})`);
+          modal.classList.remove("active");
+          document.getElementById("add-product-form").reset();
+          await loadDashboard();
+          return;
+        }
+      } catch (err) {
+        console.log("Offline product addition simulation:", err);
+      }
+
+      // Offline simulation
+      const newId = inventoryData.length + 1;
+      inventoryData.push({ id: newId, name, price, stock, low_stock_threshold: threshold });
+      addAuditLog("add_product", `Added new product "${name}" (Offline)`);
+      modal.classList.remove("active");
+      document.getElementById("add-product-form").reset();
+      renderInventoryTable();
+      loadStats();
+    });
+
+    // Initial load
+    loadDashboard();
+  </script>
+</body>
+</html>
