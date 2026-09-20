@@ -87,8 +87,32 @@ async def chat_endpoint(request: Request):
 
 
 # =====================================================================
-# REST ENDPOINTS FOR SHARED BACKEND (Used by Phonecall & External Clients)
+# REST ENDPOINTS FOR SHARED BACKEND & ADMIN PORTAL
 # =====================================================================
+
+@app.get("/api/products")
+def get_products():
+    """Get all products from the store catalog."""
+    return tools.get_all_products()
+
+
+class AddProductSchema(BaseModel):
+    name: str
+    price: float
+    stock: int
+    low_stock_threshold: Optional[int] = 5
+
+
+@app.post("/api/products")
+def add_product_endpoint(payload: AddProductSchema):
+    """Add a new product to store catalog."""
+    return tools.add_product(
+        name=payload.name,
+        price=payload.price,
+        stock=payload.stock,
+        low_stock_threshold=payload.low_stock_threshold or 5
+    )
+
 
 @app.get("/api/products/search")
 def search_products(q: str = ""):
@@ -111,6 +135,26 @@ def get_product_inventory(product_id: int):
     return res
 
 
+class UpdateInventorySchema(BaseModel):
+    product_id: int
+    qty_delta: int
+
+
+@app.post("/api/inventory/update")
+def update_inventory_endpoint(payload: UpdateInventorySchema):
+    """Update stock for a product."""
+    res = tools.update_inventory(payload.product_id, payload.qty_delta)
+    if "error" in res:
+        return JSONResponse(res, status_code=400)
+    return res
+
+
+@app.get("/api/orders")
+def get_orders():
+    """Get all orders with customer & line item details."""
+    return tools.get_all_orders()
+
+
 class OrderItemSchema(BaseModel):
     product_id: int
     quantity: int
@@ -121,7 +165,7 @@ class CreateOrderSchema(BaseModel):
     items: List[OrderItemSchema]
     customer_name: Optional[str] = None
     address: Optional[str] = None
-    source: Optional[str] = "api"
+    source: Optional[str] = "web"
 
 
 @app.post("/api/orders")
@@ -134,11 +178,43 @@ def create_order_endpoint(payload: CreateOrderSchema):
         customer_phone=payload.customer_phone,
         items=items_dict,
         customer_name=payload.customer_name,
-        address=payload.address
+        address=payload.address,
+        source=payload.source
     )
     if "error" in res:
         return JSONResponse(res, status_code=400)
     return res
+
+
+class OrderStatusSchema(BaseModel):
+    status: str
+
+
+@app.post("/api/orders/{order_id}/status")
+def update_order_status_endpoint(order_id: int, payload: OrderStatusSchema):
+    """Update status for a given order ID."""
+    return tools.update_order_status(order_id, payload.status)
+
+
+class LoginSchema(BaseModel):
+    username: str
+    password: str
+
+ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
+ADMIN_PASS = os.environ.get("ADMIN_PASS", "1234")
+
+@app.post("/api/login")
+def login_endpoint(payload: LoginSchema):
+    """Admin portal login endpoint."""
+    if payload.username == ADMIN_USER and payload.password == ADMIN_PASS:
+        return {"success": True, "token": "kirana-admin-auth-token-2026", "username": payload.username}
+    return JSONResponse({"success": False, "error": "Invalid Kirana ID or Password"}, status_code=401)
+
+
+@app.get("/api/stats")
+def get_stats():
+    """Get overall store summary KPIs."""
+    return tools.get_store_stats()
 
 
 if __name__ == "__main__":
