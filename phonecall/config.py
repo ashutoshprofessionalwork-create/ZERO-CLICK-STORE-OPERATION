@@ -64,6 +64,6 @@ SILENCE_PROMPT = os.getenv(
 # Store name used in system prompt and communications
 STORE_NAME = os.getenv("STORE_NAME", "Zero-Click Store")
 
-# Server host & port
+# Server host & port (default to 8001 for standalone voice server to avoid conflict with main backend on 8000)
 HOST = os.getenv("HOST", "0.0.0.0")
-PORT = int(os.getenv("PORT", "8000"))
+PORT = int(os.getenv("PORT", "8001"))

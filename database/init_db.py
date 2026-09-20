@@ -38,6 +38,7 @@ def init_db(db_path: str = DB_PATH):
         customer_id INTEGER,
         total REAL,
         status TEXT DEFAULT 'confirmed',
+        source TEXT DEFAULT 'web',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (customer_id) REFERENCES customers(id)
     );

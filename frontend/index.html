@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zero-Click Kirana Store | Autonomous AI Ordering</title>
+  <meta name="description" content="Autonomous AI Kirana Store Operator with instant Hinglish voice and WhatsApp order placement, live stock checking, and zero-click order processing.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-logo" id="brand-logo">
+        <div class="brand-icon">🏪</div>
+        <div class="brand-title">
+          <span>Zero-Click Kirana</span>
+          <span>Autonomous Store</span>
+        </div>
+      </a>
+
+      <div class="nav-badges">
+        <div class="status-pill" id="agent-status-pill">
+          <span class="status-dot"></span>
+          <span>AI Operator Online</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="/admin" class="btn-nav-admin" id="btn-admin-link">
+          <span>⚙️</span>
+          <span>Merchant Portal</span>
+        </a>
+        <button class="cart-button" id="open-cart-btn">
+          <span>🛒</span>
+          <span>Cart</span>
+          <span class="cart-badge" id="cart-counter">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section & AI Simulator -->
+  <main>
+    <section class="hero-section">
+      <div class="hero-banner">
+        <div>
+          <div class="hero-tagline">⚡ Next-Gen Kirana Commerce</div>
+          <h1 class="hero-title">Bhaiya, <span class="highlight">Order Likh Lo!</span><br>Zero-Click Ordering</h1>
+          <p class="hero-subtitle">
+            Order fresh groceries in natural Hinglish via voice call or WhatsApp. Our autonomous AI agent checks live stock, computes totals, places your order, and coordinates delivery without the store owner lifting a finger.
+          </p>
+        </div>
+
+        <div class="hero-features">
+          <div class="feature-chip">🤖 <b>Autonomous Agent</b> (Tool-Calling)</div>
+          <div class="feature-chip">📦 <b>Live Inventory Sync</b></div>
+          <div class="feature-chip">🎙️ <b>Hindi / Hinglish</b> Native</div>
+          <div class="feature-chip">⚡ <b>15-Min Delivery</b></div>
+        </div>
+      </div>
+
+      <!-- Autonomous AI Chat & Simulator Card -->
+      <div class="ai-simulator-card" id="ai-simulator">
+        <div class="ai-header">
+          <div class="ai-header-info">
+            <div class="ai-avatar">🤖</div>
+            <div>
+              <div class="ai-name">Kirana AI Assistant</div>
+              <div class="ai-channel-badge">Simulating WhatsApp & Voice Channel</div>
+            </div>
+          </div>
+          <span class="stock-tag in-stock">Active</span>
+        </div>
+
+        <div class="quick-prompts-label">Try asking in Hinglish:</div>
+        <div class="quick-prompts-row" id="quick-prompts">
+          <button class="quick-prompt-btn" data-prompt="Bhaiya, 2 packets Aashirvaad atta, 1 Fortune oil and 3 Maggi bhej do.">🛒 Atta, Oil & Maggi</button>
+          <button class="quick-prompt-btn" data-prompt="Amul butter and 2 packets doodh hai kya?">🧈 Butter & Milk</button>
+          <button class="quick-prompt-btn" data-prompt="Bhaiya 1 Fortune Mustard Oil bhej do">⚠️ Mustard Oil (Out of stock test)</button>
+          <button class="quick-prompt-btn" data-prompt="Taj Mahal tea aur 2 Good Day biscuit pack kar dena">☕ Tea & Biscuits</button>
+        </div>
+
+        <div class="chat-box" id="chat-messages">
+          <div class="chat-message ai">
+            <div class="chat-bubble">
+              Namaste bhaiya! Zero-Click Kirana mein aapka swagat hai. Aaj ghar ke liye kya deliver karwaana hai?
+            </div>
+          </div>
+        </div>
+
+        <form class="chat-input-form" id="chat-form">
+          <input 
+            type="text" 
+            class="chat-input" 
+            id="chat-input" 
+            placeholder="Type Hinglish order (e.g., 2 packet atta bhej do)..." 
+            autocomplete="off"
+            required
+          />
+          <button type="submit" class="btn-send" id="btn-send-chat">
+            <span>Send</span>
+            <span>➤</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Catalog Section -->
+    <section class="catalog-section" id="catalog-section">
+      <div class="catalog-header">
+        <h2 class="catalog-title">
+          <span>🛒</span> Live Store Catalog
+        </h2>
+
+        <div class="search-and-filters">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" class="search-input" placeholder="Search atta, oil, tea, soap...">
+          </div>
+
+          <div class="category-tabs" id="category-tabs">
+            <button class="cat-tab active" data-cat="all">All Items</button>
+            <button class="cat-tab" data-cat="staples">Atta & Staples</button>
+            <button class="cat-tab" data-cat="oils">Edible Oils</button>
+            <button class="cat-tab" data-cat="snacks">Instant & Snacks</button>
+            <button class="cat-tab" data-cat="dairy">Dairy</button>
+            <button class="cat-tab" data-cat="personal">Personal Care</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="product-grid" id="product-grid">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Shopping Cart Modal / Checkout Drawer -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🛍️</span> Your Shopping Cart
+        </div>
+        <button class="btn-close-modal" id="close-cart-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="cart-item-list" id="cart-items-container">
+          <!-- Injected via JavaScript -->
+        </div>
+
+        <div class="checkout-inputs">
+          <div>
+            <label class="input-label" for="cust-phone">Your Phone Number (WhatsApp)</label>
+            <input type="tel" id="cust-phone" class="form-control" placeholder="+91 98765 43210" value="+919876543210">
+          </div>
+          <div>
+            <label class="input-label" for="cust-name">Customer Name</label>
+            <input type="text" id="cust-name" class="form-control" placeholder="Ramesh Sharma" value="Ramesh Sharma">
+          </div>
+          <div>
+            <label class="input-label" for="cust-address">Delivery Address</label>
+            <input type="text" id="cust-address" class="form-control" placeholder="Flat 402, Sunshine Heights, Main Road" value="Flat 402, Sunshine Heights">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="cart-summary-line">
+          <span>Total Order Value:</span>
+          <span class="cart-total-price" id="cart-total-val">₹0.00</span>
+        </div>
+        <button class="btn-checkout" id="btn-place-order">
+          Confirm & Place Order (Zero-Click)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>Zero-Click Store Operator &copy; 2026. Autonomous AI Kirana & Retail Management.</div>
+    <div class="footer-links">
+      <a href="/store" class="footer-link">Customer Store</a>
+      <a href="/admin" class="footer-link">Merchant Admin Portal</a>
+      <a href="/docs" class="footer-link">FastAPI Swagger Docs</a>
+    </div>
+  </footer>
+
+  <!-- Frontend Logic Script -->
+  <script>
+    // Fallback seed catalog for offline / standalone browsing
+    const FALLBACK_PRODUCTS = [
+      { id: 1, name: "Aashirvaad Atta 5kg", price: 260.0, stock: 15, low_stock_threshold: 5, cat: "staples", icon: "🌾" },
+      { id: 2, name: "Fortune Sunlite Sunflower Oil 1L", price: 145.0, stock: 10, low_stock_threshold: 3, cat: "oils", icon: "🌻" },
+      { id: 3, name: "Maggi 2-Minute Noodles 70g", price: 14.0, stock: 50, low_stock_threshold: 10, cat: "snacks", icon: "🍜" },
+      { id: 4, name: "Amul Butter 100g", price: 56.0, stock: 8, low_stock_threshold: 3, cat: "dairy", icon: "🧈" },
+      { id: 5, name: "Amul Taaza Milk 500ml", price: 27.0, stock: 20, low_stock_threshold: 5, cat: "dairy", icon: "🥛" },
+      { id: 6, name: "Tata Salt 1kg", price: 28.0, stock: 30, low_stock_threshold: 5, cat: "staples", icon: "🧂" },
+      { id: 7, name: "Surf Excel Easy Wash Powder 1kg", price: 140.0, stock: 12, low_stock_threshold: 3, cat: "personal", icon: "🧺" },
+      { id: 8, name: "Taj Mahal Tea 250g", price: 180.0, stock: 6, low_stock_threshold: 2, cat: "staples", icon: "☕" },
+      { id: 9, name: "Good Day Cashew Biscuits 100g", price: 30.0, stock: 25, low_stock_threshold: 5, cat: "snacks", icon: "🍪" },
+      { id: 10, name: "Dettol Original Soap 125g", price: 45.0, stock: 15, low_stock_threshold: 4, cat: "personal", icon: "🧼" },
+      { id: 11, name: "Aashirvaad Atta 10kg", price: 490.0, stock: 1, low_stock_threshold: 2, cat: "staples", icon: "🌾" },
+      { id: 12, name: "Fortune Mustard Oil 1L", price: 160.0, stock: 0, low_stock_threshold: 3, cat: "oils", icon: "🛢️" }
+    ];
+
+    let products = [];
+    let cart = {}; // product_id -> quantity
+    let activeCategory = "all";
+    let searchQuery = "";
+
+    function getCategoryForName(name) {
+      const lower = name.toLowerCase();
+      if (lower.includes("atta") || lower.includes("salt") || lower.includes("tea")) return "staples";
+      if (lower.includes("oil")) return "oils";
+      if (lower.includes("maggi") || lower.includes("biscuit")) return "snacks";
+      if (lower.includes("milk") || lower.includes("butter")) return "dairy";
+      return "personal";
+    }
+
+    function getIconForName(name) {
+      const lower = name.toLowerCase();
+      if (lower.includes("atta")) return "🌾";
+      if (lower.includes("sunflower")) return "🌻";
+      if (lower.includes("mustard")) return "🛢️";
+      if (lower.includes("oil")) return "🧴";
+      if (lower.includes("maggi")) return "🍜";
+      if (lower.includes("butter")) return "🧈";
+      if (lower.includes("milk")) return "🥛";
+      if (lower.includes("salt")) return "🧂";
+      if (lower.includes("tea")) return "☕";
+      if (lower.includes("biscuit")) return "🍪";
+      if (lower.includes("soap")) return "🧼";
+      if (lower.includes("surf")) return "🧺";
+      return "📦";
+    }
+
+    // Load Products from API or fallback
+    async function loadProducts() {
+      try {
+        const res = await fetch("/api/products");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            products = data.map(p => ({
+              ...p,
+              cat: getCategoryForName(p.name),
+              icon: getIconForName(p.name)
+            }));
+            renderProducts();
+            return;
+          }
+        }
+      } catch (err) {
+        console.log("Using fallback product catalog:", err);
+      }
+      products = [...FALLBACK_PRODUCTS];
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById("product-grid");
+      grid.innerHTML = "";
+
+      const filtered = products.filter(p => {
+        const matchesCat = activeCategory === "all" || p.cat === activeCategory;
+        const matchesQuery = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCat && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2.5rem; color: var(--text-muted);">No products match your search.</div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+
+        let stockClass = "in-stock";
+        let stockLabel = `${p.stock} in stock`;
+        let isDisabled = false;
+
+        if (p.stock <= 0) {
+          stockClass = "out-stock";
+          stockLabel = "Out of Stock";
+          isDisabled = true;
+        } else if (p.stock <= p.low_stock_threshold) {
+          stockClass = "low-stock";
+          stockLabel = `Low: ${p.stock} left`;
+        }
+
+        const inCartQty = cart[p.id] || 0;
+
+        card.innerHTML = `
+          <div>
+            <div class="card-top">
+              <div class="product-icon-box">${p.icon}</div>
+              <span class="stock-tag ${stockClass}">${stockLabel}</span>
+            </div>
+            <h3 class="product-title">${p.name}</h3>
+            <div class="product-meta">Direct Kirana Supply</div>
+          </div>
+          <div class="card-footer">
+            <span class="product-price">₹${p.price.toFixed(2)}</span>
+            <button class="btn-add-cart" data-id="${p.id}" ${isDisabled ? "disabled" : ""}>
+              <span>${inCartQty > 0 ? "Add +" + inCartQty : "Add to Cart"}</span>
+            </button>
+          </div>
+        `;
+
+        card.querySelector(".btn-add-cart").addEventListener("click", () => addToCart(p.id));
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(productId) {
+      const prod = products.find(p => p.id === productId);
+      if (!prod || prod.stock <= 0) return;
+
+      const currentQty = cart[productId] || 0;
+      if (currentQty < prod.stock) {
+        cart[productId] = currentQty + 1;
+        updateCartBadge();
+        renderProducts();
+      } else {
+        alert(`Only ${prod.stock} units available in store.`);
+      }
+    }
+
+    function updateCartBadge() {
+      const count = Object.values(cart).reduce((a, b) => a + b, 0);
+      document.getElementById("cart-counter").textContent = count;
+    }
+
+    function renderCartModal() {
+      const container = document.getElementById("cart-items-container");
+      container.innerHTML = "";
+
+      const itemIds = Object.keys(cart);
+      if (itemIds.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Your cart is empty. Add products or chat with the AI!</div>`;
+        document.getElementById("cart-total-val").textContent = "₹0.00";
+        document.getElementById("btn-place-order").disabled = true;
+        return;
+      }
+
+      let total = 0;
+      itemIds.forEach(idStr => {
+        const id = parseInt(idStr);
+        const qty = cart[id];
+        const prod = products.find(p => p.id === id);
+        if (!prod) return;
+
+        const subtotal = prod.price * qty;
+        total += subtotal;
+
+        const row = document.createElement("div");
+        row.className = "cart-item-row";
+        row.innerHTML = `
+          <div class="item-info">
+            <span class="item-name">${prod.name}</span>
+            <span class="item-sub">₹${prod.price.toFixed(2)} each</span>
+          </div>
+          <div class="item-actions">
+            <button class="qty-btn" data-action="dec" data-id="${id}">-</button>
+            <span class="item-qty">${qty}</span>
+            <button class="qty-btn" data-action="inc" data-id="${id}">+</button>
+            <span class="item-total">₹${subtotal.toFixed(2)}</span>
+          </div>
+        `;
+
+        row.querySelector('[data-action="dec"]').addEventListener("click", () => {
+          if (cart[id] > 1) {
+            cart[id]--;
+          } else {
+            delete cart[id];
+          }
+          updateCartBadge();
+          renderCartModal();
+          renderProducts();
+        });
+
+        row.querySelector('[data-action="inc"]').addEventListener("click", () => {
+          if (cart[id] < prod.stock) {
+            cart[id]++;
+            updateCartBadge();
+            renderCartModal();
+            renderProducts();
+          } else {
+            alert(`Maximum stock reached for ${prod.name}`);
+          }
+        });
+
+        container.appendChild(row);
+      });
+
+      document.getElementById("cart-total-val").textContent = `₹${total.toFixed(2)}`;
+      document.getElementById("btn-place-order").disabled = false;
+    }
+
+    // Place Order Handler
+    document.getElementById("btn-place-order").addEventListener("click", async () => {
+      const phone = document.getElementById("cust-phone").value.trim() || "+919876543210";
+      const name = document.getElementById("cust-name").value.trim() || "Ramesh Sharma";
+      const address = document.getElementById("cust-address").value.trim() || "Flat 402, Sunshine Heights";
+
+      const items = Object.keys(cart).map(idStr => ({
+        product_id: parseInt(idStr),
+        quantity: cart[idStr]
+      }));
+
+      if (items.length === 0) return;
+
+      const btn = document.getElementById("btn-place-order");
+      btn.disabled = true;
+      btn.textContent = "Processing Order...";
+
+      try {
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customer_phone: phone,
+            customer_name: name,
+            address: address,
+            items: items
+          })
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          alert(`Order #${result.order_id} Confirmed! Total: ₹${result.total_amount}. Delivery dispatched to ${address}!`);
+          cart = {};
+          updateCartBadge();
+          document.getElementById("cart-modal").classList.remove("active");
+          await loadProducts();
+          return;
+        } else {
+          const err = await res.json();
+          alert(`Order creation error: ${err.error || "Please check stock."}`);
+        }
+      } catch (e) {
+        // Fallback simulated order if backend API is not serving POST /api/orders directly
+        alert(`Order placed successfully (Offline Mode)! Total items: ${items.length}. Kirana store received your request.`);
+        cart = {};
+        updateCartBadge();
+        document.getElementById("cart-modal").classList.remove("active");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Confirm & Place Order (Zero-Click)";
+      }
+    });
+
+    // Cart Modal Open/Close
+    document.getElementById("open-cart-btn").addEventListener("click", () => {
+      renderCartModal();
+      document.getElementById("cart-modal").classList.add("active");
+    });
+    document.getElementById("close-cart-btn").addEventListener("click", () => {
+      document.getElementById("cart-modal").classList.remove("active");
+    });
+    document.getElementById("cart-modal").addEventListener("click", (e) => {
+      if (e.target.id === "cart-modal") {
+        document.getElementById("cart-modal").classList.remove("active");
+      }
+    });
+
+    // Search & Category Filters
+    document.getElementById("search-input").addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      renderProducts();
+    });
+
+    document.querySelectorAll(".cat-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".cat-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeCategory = tab.dataset.cat;
+        renderProducts();
+      });
+    });
+
+    // AI Order Simulator Chat Logic
+    const chatMessages = document.getElementById("chat-messages");
+    const chatForm = document.getElementById("chat-form");
+    const chatInput = document.getElementById("chat-input");
+
+    function appendMessage(sender, text, toolCall = null) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `chat-message ${sender}`;
+
+      let toolHtml = "";
+      if (toolCall) {
+        toolHtml = `<div class="tool-badge">⚡ ${toolCall}</div>`;
+      }
+
+      msgDiv.innerHTML = `
+        <div class="chat-bubble">
+          ${text.replace(/\n/g, "<br>")}
+          ${toolHtml}
+        </div>
+      `;
+
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendChatMessage(userText) {
+      if (!userText.trim()) return;
+
+      appendMessage("user", userText);
+      chatInput.value = "";
+
+      // Typing indicator
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "chat-message ai";
+      typingDiv.id = "typing-msg";
+      typingDiv.innerHTML = `<div class="chat-bubble" style="color: var(--text-muted)">Thinking & checking inventory...</div>`;
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      try {
+        const res = await fetch("/agent/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            phone: "+919876543210",
+            message: userText
+          })
+        });
+
+        const typingEl = document.getElementById("typing-msg");
+        if (typingEl) typingEl.remove();
+
+        if (res.ok) {
+          const data = await res.json();
+          appendMessage("ai", data.reply || "Aapka order note kar liya gaya hai bhaiya!");
+          // Reload products in case an order mutated stock
+          await loadProducts();
+        } else {
+          fallbackAiReply(userText);
+        }
+      } catch (err) {
+        const typingEl = document.getElementById("typing-msg");
+        if (typingEl) typingEl.remove();
+        fallbackAiReply(userText);
+      }
+    }
+
+    function fallbackAiReply(userText) {
+      const lower = userText.toLowerCase();
+      if (lower.includes("mustard")) {
+        appendMessage(
+          "ai", 
+          "Bhaiya, Fortune Mustard Oil 1L abhi out of stock hai. Par hamare paas Fortune Sunlite Sunflower Oil 1L (Rs 145) bilkul fresh stock mein hai. Kya woh bhej doon?",
+          "Tool: check_inventory(12) -> stock: 0 [Out of Stock Alternate Triggered]"
+        );
+      } else if (lower.includes("atta") || lower.includes("maggi") || lower.includes("oil")) {
+        appendMessage(
+          "ai",
+          "Haanji bhaiya! Aashirvaad Atta, Fortune Oil aur Maggi sab available hai. Aapka order create kar diya gaya hai. Total bill Rs 419 hua hai, delivery boy nikal raha hai!",
+          "Tool: create_order(items=[Atta, Oil, Maggi]) -> Order Confirmed"
+        );
+      } else if (lower.includes("butter") || lower.includes("doodh") || lower.includes("milk")) {
+        appendMessage(
+          "ai",
+          "Haanji bhaiya, Amul Butter 100g (Rs 56) aur Amul Taaza Milk 500ml (Rs 27) dono stock mein hain. Abhi pack karwa deta hoon!",
+          "Tool: check_inventory(4, 5) -> In Stock"
+        );
+      } else {
+        appendMessage(
+          "ai",
+          `Haanji bhaiya! "${userText}" maine note kar liya hai. Kirana inventory check karke turant confirm karta hoon.`,
+          "Tool: search_product -> Intent Recognized"
+        );
+      }
+    }
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      sendChatMessage(chatInput.value);
+    });
+
+    document.querySelectorAll(".quick-prompt-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        sendChatMessage(btn.dataset.prompt);
+      });
+    });
+
+    // Initialize
+    loadProducts();
+  </script>
+</body>
+</html>

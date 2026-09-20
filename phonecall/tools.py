@@ -162,6 +162,12 @@ async def search_product(query: str) -> Dict[str, Any]:
                 }
 
     except httpx.ConnectError:
+        try:
+            from backend import tools as local_tools
+            res = local_tools.search_product(clean_query)
+            return {"products": res}
+        except Exception:
+            pass
         err_msg = (
             f"Cannot connect to team's backend at {config.BACKEND_URL}. "
             "Please ensure teammate's backend server is running."
@@ -204,6 +210,14 @@ async def check_inventory(product_id: int) -> Dict[str, Any]:
                 return {"error": f"HTTP {response.status_code}", "details": response.text}
 
     except httpx.ConnectError:
+        try:
+            from backend import tools as local_tools
+            res = local_tools.check_inventory(product_id)
+            if "error" not in res:
+                return res
+            return {"error": "not_found", "message": f"Product ID {product_id} nahi mila."}
+        except Exception:
+            pass
         err_msg = f"Cannot connect to team backend at {config.BACKEND_URL}."
         logger.error(err_msg)
         return {"error": "backend_offline", "message": err_msg}
@@ -264,6 +278,18 @@ async def create_order(customer_phone: str, items: List[Dict[str, int]]) -> Dict
                     return {"error": f"HTTP {response.status_code}", "details": response.text}
 
     except httpx.ConnectError:
+        try:
+            from backend import tools as local_tools
+            res = local_tools.create_order(
+                customer_phone=customer_phone,
+                items=items,
+                source="phone"
+            )
+            if "error" not in res:
+                return res
+            return {"error": "order_failed", "details": res.get("error")}
+        except Exception:
+            pass
         err_msg = f"Cannot connect to team backend at {config.BACKEND_URL} to create order."
         logger.error(err_msg)
         return {"error": "backend_offline", "message": err_msg}

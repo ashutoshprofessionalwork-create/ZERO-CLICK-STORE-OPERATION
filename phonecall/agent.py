@@ -187,6 +187,12 @@ async def run_offline_fallback(customer_phone: str, customer_speech: str) -> str
     if any(greet in text_lower for greet in ["namaste", "hello", "hi", "kaise ho"]):
         return "Namaste bhaiya! Boliye, aaj kya mangwana hai? Atta, oil, maggi sab available hai."
 
+    if "mustard" in text_lower:
+        search_res = await tools.search_product("sunflower")
+        alt = search_res.get("products", [])
+        alt_name = alt[0]["name"] if alt else "Fortune Sunflower Oil"
+        return f"Bhaiya Fortune Mustard Oil out of stock hai. Kya {alt_name} bhej doon?"
+
     if "oil" in text_lower or "tel" in text_lower:
         # Check backend search
         search_res = await tools.search_product("oil")
@@ -196,9 +202,9 @@ async def run_offline_fallback(customer_phone: str, customer_speech: str) -> str
             return f"Bhaiya hamare paas {', '.join(names)} hai. Kaunsa bhej doon?"
         return "Bhaiya oil me Fortune Sunflower aur Mustard dono hai. Kaunsa chahiye?"
 
-    if "maggi" in text_lower or "atta" in text_lower:
-        # Check backend search
-        search_res = await tools.search_product("maggi" if "maggi" in text_lower else "atta")
+    if "maggi" in text_lower or "atta" in text_lower or "butter" in text_lower or "milk" in text_lower or "salt" in text_lower:
+        kw = "maggi" if "maggi" in text_lower else ("atta" if "atta" in text_lower else ("butter" if "butter" in text_lower else "milk"))
+        search_res = await tools.search_product(kw)
         products = search_res.get("products", [])
         if products:
             p = products[0]
@@ -209,7 +215,8 @@ async def run_offline_fallback(customer_phone: str, customer_speech: str) -> str
                     items=[{"product_id": p["id"], "quantity": 1}]
                 )
                 if "order_id" in order_res:
-                    return f"Ho gaya bhaiya. {p['name']} add kar diya hai. Total {order_res.get('total', p['price'])} rupaye hue."
+                    tot = order_res.get("total", order_res.get("total_amount", p["price"]))
+                    return f"Ho gaya bhaiya. {p['name']} add kar diya hai. Total {tot} rupaye hue."
             else:
                 return f"Bhaiya {p['name']} out of stock hai. Kya koi dusra option bhej doon?"
 
